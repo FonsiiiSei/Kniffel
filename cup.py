@@ -1,4 +1,5 @@
 import dice
+import cup_utils
 
 class Cup:
     def __init__(self):
@@ -14,3 +15,13 @@ class Cup:
         for element in self.dicelist:
             display.append(element.show());
         print(display)
+
+    def manageHolding(self):
+        self.displayCup();
+        dices_to_keep = input("Welche Würfel sollen behalten werden?")
+        dices_to_keep = [int(element.strip()) for element in dices_to_keep.split(",")]
+        cup_utils.prepareChange(self.dicelist, dices_to_keep)
+        self.displayCup();
+        
+
+        

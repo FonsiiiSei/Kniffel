@@ -10,4 +10,4 @@ class Dice:
         self.value = random.randint(1,6)
 
     def show(self):
-        return self.value
+        return f"{self.value} - {self.out}" 
