@@ -18,10 +18,12 @@ class Cup:
 
     def manageHolding(self):
         self.displayCup();
-        dices_to_keep = input("Welche Würfel sollen behalten werden?")
-        dices_to_keep = [int(element.strip()) for element in dices_to_keep.split(",")]
-        cup_utils.prepareChange(self.dicelist, dices_to_keep)
-        self.displayCup();
+        for i in range(0, 2):
+            dices_to_keep = input("Welche Würfel sollen neu gewürfelt werden?")
+            dices_to_keep = [int(element.strip()) for element in dices_to_keep.split(",")]
+            cup_utils.prepareChange(self.dicelist, dices_to_keep)
+            cup_utils.executeChange(self.dicelist);
+            self.displayCup();
         
 
         
