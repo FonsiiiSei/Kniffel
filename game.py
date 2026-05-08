@@ -2,6 +2,7 @@ import pygame
 
 pygame.init()
 
+# Defining the border for the field
 WIDTH, HEIGHT = 900, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Kniffel")
@@ -9,6 +10,7 @@ pygame.display.set_caption("Kniffel")
 font = pygame.font.SysFont("Arial", 26)
 small_font = pygame.font.SysFont("Arial", 18)
 
+#preDefining Colors
 WHITE = (245, 245, 245)
 BLACK = (20, 20, 20)
 GRAY = (210, 210, 210)
@@ -16,6 +18,7 @@ DARK_GRAY = (80, 80, 80)
 GREEN = (30, 120, 60)
 BLUE = (80, 160, 255)
 
+#preDefining the rules for the list
 rules = [
     "Einser", "Zweier", "Dreier", "Vierer", "Fünfer", "Sechser",
     "Dreierpasch", "Viererpasch", "Full House", "Kleine Straße",
@@ -40,9 +43,11 @@ while running:
             running = False
 
         if event.type == pygame.MOUSEBUTTONDOWN:
+            #wurde das Regelfeld geklickt => Feld wird auf aktiv geschalten
             if rule_input_rect.collidepoint(event.pos):
                 active_rule = True
                 active_keep = False
+            #wurde das behaltenfeld geklickt => Feld wird auf aktiv geschalten
             elif keep_input_rect.collidepoint(event.pos):
                 active_keep = True
                 active_rule = False

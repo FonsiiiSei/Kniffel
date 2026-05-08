@@ -10,4 +10,12 @@ class Rules:
 
         return False
     
-    
+    def all_singles(self, cup, pSingleDice):
+        sumSingle = 0;
+
+        for element in cup.dicelist:
+            if int(element.value) == pSingleDice:
+                sumSingle = sumSingle + pSingleDice;
+
+        print(sumSingle);
+        return sumSingle;
