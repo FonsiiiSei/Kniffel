@@ -19,3 +19,6 @@ class Rules:
 
         print(sumSingle);
         return sumSingle;
+
+    def three_Row(self, cup):
+       

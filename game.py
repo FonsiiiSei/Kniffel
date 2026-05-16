@@ -1,146 +1,209 @@
+# game.py
 import pygame
 
-pygame.init()
 
-# Defining the border for the field
-WIDTH, HEIGHT = 900, 600
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Kniffel")
+class Game:
+    def __init__(self):
+        pygame.init()
 
-font = pygame.font.SysFont("Arial", 26)
-small_font = pygame.font.SysFont("Arial", 18)
+        self.WIDTH = 900
+        self.HEIGHT = 600
 
-#preDefining Colors
-WHITE = (245, 245, 245)
-BLACK = (20, 20, 20)
-GRAY = (210, 210, 210)
-DARK_GRAY = (80, 80, 80)
-GREEN = (30, 120, 60)
-BLUE = (80, 160, 255)
+        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        pygame.display.set_caption("Kniffel")
 
-#preDefining the rules for the list
-rules = [
-    "Einser", "Zweier", "Dreier", "Vierer", "Fünfer", "Sechser",
-    "Dreierpasch", "Viererpasch", "Full House", "Kleine Straße",
-    "Große Straße", "Kniffel", "Chance"
-]
+        self.font = pygame.font.SysFont("Arial", 26)
+        self.small_font = pygame.font.SysFont("Arial", 18)
 
-rule_text = ""
-keep_text = ""
+        self.WHITE = (245, 245, 245)
+        self.BLACK = (20, 20, 20)
+        self.GRAY = (210, 210, 210)
+        self.DARK_GRAY = (80, 80, 80)
+        self.GREEN = (30, 120, 60)
+        self.BLUE = (80, 160, 255)
 
-active_rule = False
-active_keep = False
+        self.roll_count = 1
+        self.max_rolls = 3
 
-running = True
+        self.rules = [
+            "Einser", "Zweier", "Dreier", "Vierer", "Fünfer", "Sechser",
+            "Dreierpasch", "Viererpasch", "Full House", "Kleine Straße",
+            "Große Straße", "Kniffel", "Chance"
+        ]
 
-while running:
-    # Eingabefelder müssen vor dem Event-Check existieren
-    rule_input_rect = pygame.Rect(390, 350, 250, 35)
-    keep_input_rect = pygame.Rect(390, 450, 250, 35)
+    def draw_dices(self, pDiceValues):
+        dice_size = 70
+        spacing = 20
+        start_x = 390
+        dice_y = 180
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+        for i in range(5):
+            dice_rect = pygame.Rect(
+                start_x + i * (dice_size + spacing),
+                dice_y,
+                dice_size,
+                dice_size
+            )
 
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            #wurde das Regelfeld geklickt => Feld wird auf aktiv geschalten
-            if rule_input_rect.collidepoint(event.pos):
-                active_rule = True
-                active_keep = False
-            #wurde das behaltenfeld geklickt => Feld wird auf aktiv geschalten
-            elif keep_input_rect.collidepoint(event.pos):
-                active_keep = True
-                active_rule = False
-            else:
-                active_rule = False
-                active_keep = False
+            pygame.draw.rect(self.screen, self.DARK_GRAY, dice_rect, border_radius=10)
+            pygame.draw.rect(self.screen, self.BLACK, dice_rect, 3, border_radius=10)
 
-        if event.type == pygame.KEYDOWN:
-            if active_rule:
-                if event.key == pygame.K_BACKSPACE:
-                    rule_text = rule_text[:-1]
-                elif event.key == pygame.K_RETURN:
-                    print("Regel-Kürzel:", rule_text)
-                else:
-                    rule_text += event.unicode.upper()
+            value = str(pDiceValues[i])
+            text_surface = self.font.render(value, True, self.WHITE)
+            text_rect = text_surface.get_rect(center=dice_rect.center)
 
-            elif active_keep:
-                if event.key == pygame.K_BACKSPACE:
-                    keep_text = keep_text[:-1]
-                elif event.key == pygame.K_RETURN:
-                    print("Behaltene Würfel:", keep_text)
-                else:
-                    keep_text += event.unicode
+            self.screen.blit(text_surface, text_rect)
 
-    screen.fill(GREEN)
+    def build_field(self, pCup):
+        rule_text = ""
+        keep_text = ""
 
-    pygame.draw.line(screen, BLACK, (320, 0), (320, HEIGHT), 3)
+        active_rule = False
+        active_keep = False
 
-    # Regeln links
-    title = font.render("Regeln", True, WHITE)
-    screen.blit(title, (40, 20))
+        running = True
 
-    y = 70
-    for rule in rules:
-        rule_rect = pygame.Rect(40, y, 220, 28)
-        pygame.draw.rect(screen, GRAY, rule_rect, border_radius=5)
-        pygame.draw.rect(screen, BLACK, rule_rect, 2, border_radius=5)
+        while running:
+            rule_input_rect = pygame.Rect(390, 350, 250, 35)
+            keep_input_rect = pygame.Rect(390, 450, 250, 35)
 
-        text = small_font.render(rule, True, BLACK)
-        screen.blit(text, (50, y + 5))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
 
-        y += 35
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if rule_input_rect.collidepoint(event.pos):
+                        active_rule = True
+                        active_keep = False
+                    elif keep_input_rect.collidepoint(event.pos):
+                        active_keep = True
+                        active_rule = False
+                    else:
+                        active_rule = False
+                        active_keep = False
 
-    # Würfel rechts
-    dice_title = font.render("Würfel", True, WHITE)
-    screen.blit(dice_title, (500, 60))
+                if event.type == pygame.KEYDOWN:
+                    if active_rule:
+                        if event.key == pygame.K_BACKSPACE:
+                            rule_text = rule_text[:-1]
 
-    dice_size = 70
-    spacing = 20
-    start_x = 390
-    dice_y = 180
+                        elif event.key == pygame.K_RETURN:
+                            print("Regel:", rule_text)
 
-    for i in range(5):
-        dice_rect = pygame.Rect(
-            start_x + i * (dice_size + spacing),
-            dice_y,
-            dice_size,
-            dice_size
-        )
+                            # später hier Regel berechnen / Punkte speichern
+                            # danach neue Runde starten
+                            self.roll_count = 1
+                            pCup.throw_all()
 
-        pygame.draw.rect(screen, DARK_GRAY, dice_rect, border_radius=10)
-        pygame.draw.rect(screen, BLACK, dice_rect, 3, border_radius=10)
+                            rule_text = ""
 
-    # Eingabefeld 1: Regel-Kürzel
-    rule_input_label = small_font.render(
-        "Kürzel eingeben (z.B. FH):",
-        True,
-        WHITE
-    )
-    screen.blit(rule_input_label, (390, 320))
+                        else:
+                            rule_text += event.unicode.upper()
 
-    border_color_rule = BLUE if active_rule else BLACK
-    pygame.draw.rect(screen, WHITE, rule_input_rect, border_radius=5)
-    pygame.draw.rect(screen, border_color_rule, rule_input_rect, 2, border_radius=5)
+                    elif active_keep:
+                        if event.key == pygame.K_BACKSPACE:
+                            keep_text = keep_text[:-1]
 
-    rule_surface = small_font.render(rule_text, True, BLACK)
-    screen.blit(rule_surface, (400, 357))
+                        elif event.key == pygame.K_RETURN:
+                            if self.roll_count < self.max_rolls:
+                                if keep_text != "":
+                                    dices_to_keep = [
+                                        int(x.strip())
+                                        for x in keep_text.split(",")
+                                    ]
 
-    # Eingabefeld 2: Würfel behalten
-    keep_input_label = small_font.render(
-        "Würfel behalten (z.B. 1,3,5):",
-        True,
-        WHITE
-    )
-    screen.blit(keep_input_label, (390, 420))
+                                    pCup.change_dices(dices_to_keep)
+                                    self.roll_count += 1
 
-    border_color_keep = BLUE if active_keep else BLACK
-    pygame.draw.rect(screen, WHITE, keep_input_rect, border_radius=5)
-    pygame.draw.rect(screen, border_color_keep, keep_input_rect, 2, border_radius=5)
+                                keep_text = ""
+                            else:
+                                print("Du hast bereits 3x gewürfelt.")
+                                keep_text = ""
 
-    keep_surface = small_font.render(keep_text, True, BLACK)
-    screen.blit(keep_surface, (400, 457))
+                        else:
+                            keep_text += event.unicode
 
-    pygame.display.flip()
+            self.screen.fill(self.GREEN)
 
-pygame.quit()
+            pygame.draw.line(
+                self.screen,
+                self.BLACK,
+                (320, 0),
+                (320, self.HEIGHT),
+                3
+            )
+
+            title = self.font.render("Regeln", True, self.WHITE)
+            self.screen.blit(title, (40, 20))
+
+            y = 70
+
+            for rule in self.rules:
+                rule_rect = pygame.Rect(40, y, 220, 28)
+
+                pygame.draw.rect(self.screen, self.GRAY, rule_rect, border_radius=5)
+                pygame.draw.rect(self.screen, self.BLACK, rule_rect, 2, border_radius=5)
+
+                text = self.small_font.render(rule, True, self.BLACK)
+                self.screen.blit(text, (50, y + 5))
+
+                y += 35
+
+            dice_title = self.font.render("Würfel", True, self.WHITE)
+            self.screen.blit(dice_title, (500, 60))
+
+            dice_values = pCup.get_values()
+            self.draw_dices(dice_values)
+
+            roll_info = self.small_font.render(
+                f"Wurf: {self.roll_count} / {self.max_rolls}",
+                True,
+                self.WHITE
+            )
+            self.screen.blit(roll_info, (390, 270))
+
+            rule_input_label = self.small_font.render(
+                "Kürzel eingeben (z.B. FH):",
+                True,
+                self.WHITE
+            )
+            self.screen.blit(rule_input_label, (390, 320))
+
+            border_color_rule = self.BLUE if active_rule else self.BLACK
+
+            pygame.draw.rect(self.screen, self.WHITE, rule_input_rect, border_radius=5)
+            pygame.draw.rect(
+                self.screen,
+                border_color_rule,
+                rule_input_rect,
+                2,
+                border_radius=5
+            )
+
+            rule_surface = self.small_font.render(rule_text, True, self.BLACK)
+            self.screen.blit(rule_surface, (400, 357))
+
+            keep_input_label = self.small_font.render(
+                "Würfel behalten (z.B. 1,3,5):",
+                True,
+                self.WHITE
+            )
+            self.screen.blit(keep_input_label, (390, 420))
+
+            border_color_keep = self.BLUE if active_keep else self.BLACK
+
+            pygame.draw.rect(self.screen, self.WHITE, keep_input_rect, border_radius=5)
+            pygame.draw.rect(
+                self.screen,
+                border_color_keep,
+                keep_input_rect,
+                2,
+                border_radius=5
+            )
+
+            keep_surface = self.small_font.render(keep_text, True, self.BLACK)
+            self.screen.blit(keep_surface, (400, 457))
+
+            pygame.display.flip()
+
+        pygame.quit()

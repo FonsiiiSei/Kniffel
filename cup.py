@@ -10,20 +10,30 @@ class Cup:
             würfel.throw()
             self.dicelist.append(würfel)
 
-    def displayCup(self):
-        display = []
+    def get_values(self):
+        values = []
+
         for element in self.dicelist:
-            display.append(element.show());
-        print(display)
+            values.append(element.value)
+
+        return values
+
+    def displayCup(self):
+        print(self.get_values())
+
+    def change_dices(self, pDicesToKeep):
+        cup_utils.prepareChange(self.dicelist, pDicesToKeep)
+        cup_utils.executeChange(self.dicelist)
 
     def manageHolding(self):
-        self.displayCup();
-        for i in range(0, 2):
-            dices_to_keep = input("Welche Würfel sollen neu gewürfelt werden?")
-            dices_to_keep = [int(element.strip()) for element in dices_to_keep.split(",")]
-            cup_utils.prepareChange(self.dicelist, dices_to_keep)
-            cup_utils.executeChange(self.dicelist);
-            self.displayCup();
-        
+        self.displayCup()
 
-        
+        for i in range(0, 2):
+            dices_to_keep = input("Welche Würfel sollen behalten werden?")
+            dices_to_keep = [
+                int(element.strip())
+                for element in dices_to_keep.split(",")
+            ]
+
+            self.change_dices(dices_to_keep)
+            self.displayCup()

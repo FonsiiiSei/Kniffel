@@ -1,8 +1,13 @@
-import dice
-import cup
-import rules;
+# main.py
 
+import cup
+import game
+
+# Becher erzeugen
 becher = cup.Cup()
-becher.manageHolding();
-regeln = rules.Rules();
-regeln.all_singles(becher, 5)
+
+# Game / Oberfläche erzeugen
+feld = game.Game()
+
+# Oberfläche starten
+feld.build_field(becher)
